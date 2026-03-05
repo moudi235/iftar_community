@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>We Are Together - Iftar</title>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* 🌙 فوانيس خفيفة */
+.lantern{
+  position:fixed;
+  top:-60px;
+  width:40px;
+  opacity:.18;
+  animation:float 12s linear infinite;
+  pointer-events:none;
+  z-index:0;
+}
+
+.l1{ left:10%; animation-delay:0s; }
+.l2{ left:50%; animation-delay:4s; }
+.l3{ left:80%; animation-delay:8s; }
+.l4{ left:25%; animation-delay:2s; }
+.l5{ left:65%; animation-delay:6s; }
+.l6{ left:90%; animation-delay:9s; }
+
+@keyframes float{
+  0%{ transform:translateY(0); }
+  100%{ transform:translateY(120vh); }
+}
+</style>
+
+
+<style>
+body{
+  margin:0;
+  font-family:'Cairo', Arial;
+  background:linear-gradient(135deg,#f8fafc,#e2e8f0);
+  color:#1e293b;
+}
+
+
+/* خلفية زخرفية */
+.bg-pattern{
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(255,215,0,.08), transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(255,215,0,.06), transparent 40%);
+  pointer-events:none;
+}
+
+/* الحاوية */
+.container{
+  max-width:480px;
+  margin:40px auto;
+  padding:20px;
+}
+
+/* البطاقة */
+.card{
+  background:white;;
+    backdrop-filter:blur(14px);
+  border-radius:20px;
+  padding:28px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.1);
+  border:1px solid rgba(255,255,255,0.08);
+}
+
+
+/* العنوان */
+.title{
+  text-align:center;
+  margin:10px 0 5px;
+  font-size:26px;
+  font-weight:700;
+}
+
+.subtitle{
+  text-align:center;
+  opacity:.8;
+  margin-bottom:18px;
+}
+
+/* صورة الإفطار */
+.hero{
+  width:100%;
+  border-radius:14px;
+  margin-bottom:16px;
+}
+
+/* الحالة */
+.status{
+  text-align:center;
+  font-weight:600;
+  margin:10px 0 16px;
+  color:#f7cf06;
+}
+
+/* الحقول */
+input{
+  width:100%;
+  padding:13px;
+  margin:8px 0;
+  border-radius:10px;
+  border:1px solid #cbd5e1;   /* نفس لون زر اللغة */
+  background:#f8fafc;
+  font-size:15px;
+  box-sizing:border-box;
+  }
+
+  input:focus{
+  outline:none;
+  border:1px solid #f7a311;
+  box-shadow:0 0 0 2px rgba(245,158,11,.2);
+}
+
+/* الزر */
+button{
+  width:100%;
+  padding:14px;
+  margin-top:10px;
+  border-radius:12px;
+  border:none;
+  background:linear-gradient(135deg,rgba(218, 156, 74, 0.777),rgba(218, 156, 74, 0.777));
+  color:#000;
+  font-weight:700;
+  font-size:16px;
+  cursor:pointer;
+  transition:.25s;
+}
+
+button:hover{
+  transform:translateY(-1px);
+}
+
+/* زر اللغة */
+.lang{
+  background:#f1f5f9;
+  color:#0f172a;
+  border:1px solid #cbd5e1;
+  border-radius:10px;
+}
+
+/* رسالة النجاح */
+.message{
+  text-align:center;
+  margin-top:12px;
+  font-weight:600;
+}
+</style>
+</head>
+
+<body>
+ <img src="lantern.png" class="lantern l1">
+ <img src="lantern.png" class="lantern l2">
+ <img src="lantern.png" class="lantern l3">
+ <img src="lantern.png" class="lantern l4">
+ <img src="lantern.png" class="lantern l5">
+ <img src="lantern.png" class="lantern l6">
+
+
+
+
+<div class="bg-pattern"></div>
+
+<div class="container">
+  <div class="card">
+
+  
+
+ 
+    <div class="subtitle" id="subtitle">Community Ramadan Iftar</div>
+
+    <img src="iftar.jpg" class="hero" alt="Iftar">
+
+    <button class="lang" onclick="toggleLang()">🌐 عربي / English</button>
+   
+
+    <div id="status" class="status">Take Your Place ...</div>
+
+    <form id="form">
+      <input id="firstName" required placeholder="First Name">
+      <input id="lastName" required placeholder="Last Name">
+      <input id="email" type="email" required placeholder="Email">
+      <input id="phone" required placeholder="Phone">
+      <button type="submit" id="submitBtn">Register</button>
+    </form>
+
+    <div id="message" class="message"></div>
+
+  </div>
+</div>
+
+<script>
+// 🔥 ضع config هنا
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyDZZDoFx4-8Ngac7JR36WO67YUCqabw0kA",
+  authDomain: "we-are-together-b770f.firebaseapp.com",
+  projectId: "we-are-together-b770f",
+  storageBucket: "we-are-together-b770f.firebasestorage.app",
+  messagingSenderId: "698473057651",
+  appId: "1:698473057651:web:13e14bcef84329fd2dc906"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// ===== limits =====
+const MAX_MAIN = 50;
+const MAX_TOTAL = 60;
+
+let isArabic=false;
+let currentCount=0;
+
+// ===== language =====
+function toggleLang(){
+  isArabic=!isArabic;
+  applyLang();
+}
+
+function applyLang(){
+  if(isArabic){
+    document.documentElement.lang="ar";
+    // title.textContent="نحن معاً";
+    subtitle.textContent="دعوة إفطار رمضاني";
+    firstName.placeholder="الاسم";
+    lastName.placeholder="اللقب";
+    email.placeholder="البريد الإلكتروني";
+    phone.placeholder="رقم الهاتف";
+    submitBtn.textContent="تسجيل";
+  }else{
+    document.documentElement.lang="en";
+    // title.textContent="We Are Together";
+    subtitle.textContent="Community Ramadan Iftar";
+    firstName.placeholder="First Name";
+    lastName.placeholder="Last Name";
+    email.placeholder="Email";
+    phone.placeholder="Phone";
+    submitBtn.textContent="Register";
+  }
+  updateStatus();
+}
+
+// ===== load count =====
+async function loadCount(){
+  const snap = await db.collection("registrations").get();
+  currentCount = snap.size;
+  updateStatus();
+}
+loadCount();
+
+// ===== status =====
+function updateStatus(){
+  if(currentCount < MAX_TOTAL){
+    status.textContent = isArabic
+      ? `عدد المسجلين: ${currentCount}`
+      : `Registered: ${currentCount}`;
+  } else {
+    status.textContent = isArabic
+      ? "❌ تم إغلاق التسجيل"
+      : "❌ Registration closed";
+    form.style.display="none";
+  }
+}
+
+// ===== submit =====
+form.addEventListener("submit", async e=>{
+  e.preventDefault();
+
+  if(currentCount >= MAX_TOTAL) return;
+
+  const emailVal=email.value.trim();
+
+  const dup = await db.collection("registrations")
+    .where("email","==",emailVal).get();
+
+  if(!dup.empty){
+    message.textContent = isArabic
+      ? "⚠️ هذا الإيميل مسجل مسبقاً"
+      : "⚠️ Email already registered";
+    return;
+  }
+
+  currentCount++;
+
+  await db.collection("registrations").add({
+    firstName:firstName.value,
+    lastName:lastName.value,
+    email:emailVal,
+    phone:phone.value,
+    type:"pending",
+    time:new Date()
+  });
+
+  message.textContent = isArabic
+    ? "✅ تم استلام طلبك وسيتم التواصل معك"
+    : "✅ Registration received. We will contact you";
+
+  form.reset();
+  updateStatus();
+});
+</script>
+
+</body>
+</html>
